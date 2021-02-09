@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Bloodhound</title>
+</head>
+<body>
+	<h1>Bloodhound</h1>
+	<ul></ul>
+	<script>
+		const electron = require('electron');
+		const {ipcRenderer} = electron;
+		const ul = document.querySelector('ul');
+
+		ipcRenderer.on('item:add', function(e, item){
+			const li = document.createElement('li');
+			const itemText = doucment.createTextNode(item);
+			li.appendChild(itemText);
+			ul.appendChild(li);
+		});
+	</script>
+</body>
+</html>
