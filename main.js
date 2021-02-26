@@ -1,6 +1,19 @@
+// import function that calls USPS API from module.js
+//import { getTracking, findTracking, ups, fedex } from 'ts-tracking-number';
+
 const electron = require('electron');
 const url = require('url');
 const path = require('path');
+
+// imports functions for validating input
+const { getTracking, findTracking, amazon, dhl, fedex, ups, usps }
+	= require('ts-tracking-number');
+
+//trying delivery-tracker package
+//const tracker = require('delivery-tracker');
+//const courier = tracker.courier(tracker.COURIER.USPS.CODE);
+
+process.env.NODE_ENV = 'development';
 
 const {app, BrowserWindow, Menu, ipcMain} = electron;
 
@@ -30,34 +43,39 @@ app.on('ready', function(){
 	Menu.setApplicationMenu(mainMenu);
 });
 
-// Handle createAddWindow()
+// Handle add item window
 function createAddWindow(){
-	// Create new window
-	addWindow = new BrowserWindow({
-		width: 300, 
-		height:200,
-		title:'Add tracking number',
+  addWindow = new BrowserWindow({
+    width: 300,
+    height:200,
+    title:'Add Shopping List Item',
 		webPreferences: {
 			nodeIntegration: true
 		}
-	});
-	// Load html into window
-	addWindow.loadURL(url.format({
-		pathname: path.join(__dirname, 'addWindow.html'),
-		protocol:'file:',
-		slashes: true
-	}));
-	// Garbage collection handle
-	addWindow.on('close', function(){
-		addWindow = null;
-	})
+
+  });
+  addWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'addWindow.html'),
+    protocol: 'file:',
+    slashes:true
+  }));
+  // Handle garbage collection
+  addWindow.on('close', function(){
+    addWindow = null;
+  });
 }
 
 // Catch item:add
-ipcMain.on('item.add', function(e, item){
-	console.log(item);
-	mainWindow.webContents.send('item:add', item);
-	addWindow.close();
+ipcMain.on('item:add', function(e, item){
+
+	// verify tracking number here and send location to mainWindow
+	//const tracking = findTracking(item);
+	var result;
+	courier.trace({item}, function(err, result));
+  mainWindow.webContents.send('item:add', item);
+  addWindow.close();
+  // Still have a reference to addWindow in memory. Need to reclaim memory (Grabage collection)
+  //addWindow = null;
 });
 // Create menu template
 const mainMenuTemplate = [
@@ -70,8 +88,11 @@ const mainMenuTemplate = [
 					createAddWindow();
 				}
 			},
-			{ 
-				label: 'Clear Items'
+			{
+				label: 'Clear Items',
+				click(){
+					mainWindow.webContents.send('item:clear');
+				}
 			},
 			{
 				label: 'Quit',
