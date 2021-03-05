@@ -10,8 +10,8 @@ const { getTracking, findTracking, amazon, dhl, fedex, ups, usps }
 	= require('ts-tracking-number');
 
 //trying delivery-tracker package
-//const tracker = require('delivery-tracker');
-//const courier = tracker.courier(tracker.COURIER.USPS.CODE);
+const tracker = require('delivery-tracker');
+const courier = tracker.courier(tracker.COURIER.USPS.CODE);
 
 process.env.NODE_ENV = 'development';
 
@@ -24,7 +24,8 @@ app.on('ready', function(){
 	// Create new window
 	mainWindow = new BrowserWindow({
 		webPreferences: {
-			nodeIntegration: true
+			nodeIntegration: true,
+			contextIsolation: false
 		}
 	});
 	// Load html into window
@@ -49,9 +50,10 @@ function createAddWindow(){
     width: 300,
     height:200,
     title:'Add Shopping List Item',
-		webPreferences: {
-			nodeIntegration: true
-		}
+	webPreferences: {
+		nodeIntegration: true,
+		contextIsolation: false
+	}
 
   });
   addWindow.loadURL(url.format({
@@ -67,13 +69,18 @@ function createAddWindow(){
 
 // Catch item:add
 ipcMain.on('item:add', function(e, item){
-
+	//var result;
+	var status;
 	// verify tracking number here and send location to mainWindow
-	//const tracking = findTracking(item);
-	var result;
-	courier.trace({item}, function(err, result));
-  mainWindow.webContents.send('item:add', item);
-  addWindow.close();
+	const tracking = findTracking(item);
+	if(tracking == []){console.log(err);}
+	courier.trace(item, function(err, result){
+		console.log(result.status);
+		status = result.status;
+	})
+	JSON.stringify(status);
+  	mainWindow.webContents.send('item:add', status);
+  	addWindow.close();
   // Still have a reference to addWindow in memory. Need to reclaim memory (Grabage collection)
   //addWindow = null;
 });
