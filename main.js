@@ -69,18 +69,20 @@ function createAddWindow(){
 
 // Catch item:add
 ipcMain.on('item:add', function(e, item){
-	//var result;
-	var status;
+	var output;
+	//var status;
 	// verify tracking number here and send location to mainWindow
 	const tracking = findTracking(item);
 	if(tracking == []){console.log(err);}
 	courier.trace(item, function(err, result){
 		console.log(result.status);
-		status = result.status;
+		//output = String(result.status);
+		mainWindow.webContents.send('item:add', item, result.status);
+  		addWindow.close();
 	})
-	JSON.stringify(status);
-  	mainWindow.webContents.send('item:add', status);
-  	addWindow.close();
+	//JSON.stringify(output);
+  	//mainWindow.webContents.send('item:add', output);
+  	//addWindow.close();
   // Still have a reference to addWindow in memory. Need to reclaim memory (Grabage collection)
   //addWindow = null;
 });

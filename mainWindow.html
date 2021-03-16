@@ -16,9 +16,9 @@
 		const {ipcRenderer} = electron;
 		const ul = document.querySelector('ul');
 
-		ipcRenderer.on('item:add', function(e, item){
+		ipcRenderer.on('item:add', function(e, number, item){
 			const li = document.createElement('li');
-			const itemText = document.createTextNode(item);
+			const itemText = document.createTextNode(number + ": " + item);
 			li.appendChild(itemText);
 			ul.appendChild(li);
 		});
