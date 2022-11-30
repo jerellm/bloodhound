@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/jerellm/bloodhound#readme",
   "dependencies": {
-    "electron": "^11.2.3"
+    "electron": "^22.0.0"
   }
 }
